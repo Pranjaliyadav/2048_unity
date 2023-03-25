@@ -17,6 +17,7 @@ public class Tile : MonoBehaviour
     private Image background;
     private TextMeshProUGUI text;
 
+    //
 
     private void Awake()
     {
