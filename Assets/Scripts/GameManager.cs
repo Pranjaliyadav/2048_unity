@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class GameManager : MonoBehaviour
     public TileBoard board;
     public CanvasGroup gameOver;
 
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI highScoreText;
+
+    private int score;
     private void Start()
     {
         NewGame();
@@ -17,6 +22,8 @@ public class GameManager : MonoBehaviour
 
     public void NewGame()
     {
+        SetScore(0);
+        highScoreText.text = LoadHighScore().ToString();
         gameOver.alpha = 0f;
         gameOver.interactable = false;
 
@@ -50,6 +57,36 @@ public class GameManager : MonoBehaviour
         }
 
         canvasGroup.alpha = to;
+    }
+
+    public void IncreaseScore(int points)
+    {
+        //whenever we merge tiles, score increased
+
+        SetScore(points + score);
+    }
+
+    private void SetScore(int score)
+    {
+        this.score = score;
+        scoreText.text = score.ToString();
+
+        SaveHighScore();
+    }
+
+    private void SaveHighScore()
+    {
+        int highScore = LoadHighScore();
+
+        if(score > highScore)
+        {
+            PlayerPrefs.SetInt("high_Score", score);
+        }
+    }
+
+    private int LoadHighScore()
+    {
+        return PlayerPrefs.GetInt("high_Score", 0);
     }
 
 }
