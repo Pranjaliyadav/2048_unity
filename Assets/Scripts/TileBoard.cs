@@ -64,6 +64,8 @@ public class TileBoard : MonoBehaviour
 
     private void MoveTiles(Vector2Int direction, int startX, int incrementX, int startY, int incrementY)
     {
+        bool changed = false;
+
         for(int x = startX;x>=0 && x < grid.width; x+= incrementX)
         {
             for(int y = startY;y>=0 && y < grid.height; y+=incrementY)
@@ -72,9 +74,13 @@ public class TileBoard : MonoBehaviour
 
                 if (cell.occupied)
                 {
-                    MoveTile(cell.tile, direction);
+                   changed |=  MoveTile(cell.tile, direction); // |= or equals, if changed set to true first time, if changed is then false asecond time, it'll take true only from frst one. so change || false kindoff situation
                 }
             }
+        }
+        if(changed)
+        {
+            StartCoroutine(WaitForChanges());
         }
     }
 
