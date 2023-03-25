@@ -14,6 +14,8 @@ public class Tile : MonoBehaviour
 
     public int number { get; private set; }
 
+    public bool locked { get;  set; } //to stop double merging, set lock to true when its merged
+
     private Image background;
     private TextMeshProUGUI text;
 
@@ -49,7 +51,7 @@ public class Tile : MonoBehaviour
 
         transform.position = cell.transform.position;
 
-    }
+    }// sets the position
 
     public void MoveTo(TileCell cell)
     {
@@ -57,15 +59,28 @@ public class Tile : MonoBehaviour
         if (this.cell != null)
         {
             this.cell.tile = null;
-        }
+        } //if already occupied, clear it out
 
         this.cell = cell;
         this.cell.tile = this;
 
-        StartCoroutine(Animate(cell.transform.position));
+        StartCoroutine(Animate(cell.transform.position,false));
+    }//animates to the position
+
+    public void Merge(TileCell cell)
+    {
+
+        if (this.cell != null)
+        {
+            this.cell.tile = null;
+        }
+        this.cell = null; //after merging we destroying that cell, as we'll get only one cell
+
+        cell.tile.locked = true;
+        StartCoroutine(Animate(cell.transform.position, true));
     }
 
-    private IEnumerator Animate(Vector3 to)
+    private IEnumerator Animate(Vector3 to,bool merging)
     {
         float elapsed = 0f;
         float duration = 0.1f;
@@ -80,7 +95,11 @@ public class Tile : MonoBehaviour
         }
 
         transform.position = to;
-    }
 
+        if (merging)
+        {
+            Destroy(gameObject);
+        }
+    }
 
 }

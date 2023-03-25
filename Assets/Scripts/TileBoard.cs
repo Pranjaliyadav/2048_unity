@@ -97,6 +97,12 @@ public class TileBoard : MonoBehaviour
             if (adjacentCell.occupied)
             {
                 //merging
+
+                if(CanMerge(tile, adjacentCell.tile))
+                {
+                    Merge(tile, adjacentCell.tile);
+                    return true; //as their is state change so we return true
+                }
                 break;
             }
 
@@ -116,12 +122,54 @@ public class TileBoard : MonoBehaviour
         return false; //if we didnt move a tile
     }
 
+    //to check if we can actually merge two cells,need to be same number
+    private bool CanMerge(Tile a, Tile b)
+    {
+        return a.number == b.number && !b.locked;
+    }
+
+    private void Merge(Tile a, Tile b)
+    {
+        tiles.Remove(a);
+        a.Merge(b.cell);
+
+        int index = Mathf.Clamp(IndexOf(b.state) + 1, 0, tileStates.Length - 1); //index stays in bounds of our tile state
+        //if we exceed 2048 state, it'll just keep using 2048 state as its clamped
+
+        int number = b.number * 2;
+
+        b.SetState(tileStates[index], number); //update state of tile
+    }
+
+    private int IndexOf(TileState state)
+    {
+        for(int i = 0; i < tileStates.Length; i++)
+        {
+            if(state == tileStates[i]) return i;
+
+        }
+
+        return -1;
+
+    }
     private IEnumerator WaitForChanges()
     {
         waiting = true;
         yield return new WaitForSeconds(0.1f);
         waiting = false;
-        
+
+        foreach( var tile in tiles)
+        {
+            tile.locked = false; //when all changed done, we just unock tile, so it can be used for merging
+        }
+
+        //creating a tile
+        if(tiles.Count != grid.size)
+        { //only creating it if we have a left space
+        CreateTile();
+
+        }
+
         //todo - create a new tile, check for game over
 
     }
